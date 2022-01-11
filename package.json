@@ -1,0 +1,32 @@
+{
+  "name": "node-red-contrib-ha-wechat",
+  "version": "1.0.0",
+  "description": "使用微信公众号控制Home Assistant里的智能设备",
+  "main": "index.js",
+  "keywords": [
+    "node-red",
+    "wechat",
+    "home-assistant"
+  ],
+  "node-red": {
+    "nodes": {
+      "wechat": "wechat/wechat.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaonianzhentan/node-red-contrib-ha-wechat.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shaonianzhentan/node-red-contrib-ha-wechat/issues"
+  },
+  "homepage": "https://github.com/shaonianzhentan/node-red-contrib-ha-wechat#readme",
+  "dependencies": {
+    "axios": "^0.24.0"
+  }
+}

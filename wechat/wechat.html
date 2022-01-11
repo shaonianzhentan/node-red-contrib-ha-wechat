@@ -1,0 +1,45 @@
+<script type="text/html" data-template-name="ha-wechat">
+    <div class="form-row">
+        <label for="node-input-server"> MQTT配置</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-hassUrl"> HA实例地址 </label>
+        <input type="text" id="node-input-hassUrl" placeholder="http://localhost:8123" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-hassToken"> HA长令牌 </label>
+        <input type="text" id="node-input-hassToken" placeholder="Token" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-topic"> 订阅主题 </label>
+        <input type="text" id="node-input-topic" placeholder="请在微信公众号中获取" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-uid"> 用户ID </label>
+        <input type="text" id="node-input-uid" placeholder="用户ID" />
+    </div>
+    <div class="form-tips"><b>提示:</b> 
+        使用前请先关注【HomeAssistant家庭助理】订阅号，发送<b>打开控制模式</b>获取相关信息
+    </div>
+</script>
+<script type="text/javascript">
+    RED.nodes.registerType('ha-wechat', {
+        category: '家庭助理',
+        color: '#C0DEED',
+        icon: "font-awesome/fa-wechat",
+        paletteLabel: '微信订阅号',
+        defaults: {
+            server: { value: "", type: "mqtt-broker", required: true },
+            hassUrl: { value: "", required: true },
+            hassToken: { value: "", required: true },
+            topic: { value: "", required: true },
+            uid: { value: "", required: true }
+        },
+        inputs: 0,
+        outputs: 1,
+        label: function () {
+            return "HomeAssistant家庭助理";
+        }
+    });
+</script>
