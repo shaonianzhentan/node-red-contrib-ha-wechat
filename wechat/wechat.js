@@ -1,5 +1,5 @@
 const CryptoUtil = require('../lib/CryptoUtil')
-const axios = require('axios')
+const HomeAssistant = require('../lib/HomeAssistant')
 
 module.exports = function (RED) {
     RED.nodes.registerType('ha-wechat', function (config) {
@@ -8,13 +8,10 @@ module.exports = function (RED) {
         const { hassUrl, hassToken, topic, uid } = config
         const server = RED.nodes.getNode(config.server);
         if (server && hassUrl && hassToken && topic && uid) {
+            server.register(this)
+            const ha = new HomeAssistant({ hassUrl, hassToken })
             // 消息临时存储
             const list = []
-            // 验证URL
-            const url = new URL(hassUrl)
-            const api = url.origin + '/api/conversation/process'
-            node.status({ fill: "green", shape: "ring", text: "配置成功" });
-            console.log('订阅主题', topic)
             server.subscribe(topic, { qos: 0 }, async function (mtopic, mpayload, mpacket) {
                 const payload = mpayload.toString()
                 console.log(payload)
@@ -40,14 +37,12 @@ module.exports = function (RED) {
                     // 加入消息队列
                     list.push({ message_id, time })
 
-                    const res = await axios.post(api, { text: content }, {
-                        headers: {
-                            'content-type': 'application/json',
-                            authorization: `Bearer ${hassToken}`
-                        }
-                    })
+                    node.send({ payload: content })
 
-                    const { speech, extra_data } = res.data.speech.plain
+                    // 文本识别
+                    const res = await ha.postApi('conversation/process', { text: content })
+                    const { speech, extra_data } = res.speech.plain
+                    console.log(speech)
                     // 返回结果
                     let result = speech
                     // 额外信息
@@ -55,6 +50,25 @@ module.exports = function (RED) {
                         if (extra_data.type == 'entity') {
                             if (Array.isArray(extra_data.data)) {
                                 const entity_id = extra_data.data[0]
+                                const domain = entity_id.split('.')[0]
+                                // 如果是摄像头，则获取图片
+                                if (domain == 'camera') {
+                                    const entity = await ha.getApi(`states/${entity_id}`)
+                                    const attributes = entity.attributes
+                                    let entity_picture = attributes.entity_picture
+                                    if (entity_picture) {
+                                        const picurl = ha.getURL(entity_picture)
+                                        // 返回结果
+                                        result = [
+                                            {
+                                                title: attributes.friendly_name,
+                                                description: speech,
+                                                picurl: picurl,
+                                                url: picurl
+                                            }
+                                        ]
+                                    }
+                                }
                                 console.log(entity_id)
                             }
                         }
@@ -66,6 +80,7 @@ module.exports = function (RED) {
                     }), uid))
                     node.status({ fill: "green", shape: "ring", text: "消息回复成功" });
                 } catch (ex) {
+                    console.log(ex)
                     node.status({ fill: "red", shape: "ring", text: JSON.stringify(ex) });
                 }
             })
