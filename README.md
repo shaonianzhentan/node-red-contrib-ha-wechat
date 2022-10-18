@@ -1,3 +1,6 @@
+# 已停止更新维护，请使用HomeAssistant插件版本
+https://github.com/shaonianzhentan/ha_wechat
+
 # node-red-contrib-ha-wechat
 使用微信公众号控制Home Assistant里的智能设备
 
